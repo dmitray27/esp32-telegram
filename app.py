@@ -18,6 +18,7 @@ def index():
     </form>
     '''
 
+
 @app.route('/update', methods=['POST'])
 def update_file():
     # Получаем данные из формы
@@ -31,7 +32,7 @@ def update_file():
     with open(file_path, "w") as file:
         file.write(new_data)
 
-    # Добавляем изменения в Git
+    # Добавляем все изменения в Git
     repo.git.add("--all")
 
     # Коммитим изменения
