@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Декодирование данных</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    textarea {
+      width: 100%;
+      height: 100px;
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+    pre {
+      background: #f4f4f4;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Декодирование данных</h1>
+  <p>Вставьте Base64-закодированные данные из GitHub:</p>
+  <textarea id="encodedInput" placeholder="Вставьте сюда Base64 данные..."></textarea>
+  <button onclick="decode()">Декодировать</button>
+  <h2>Результат:</h2>
+  <pre id="output"></pre>
+
+  <script>
+    function decodeData(base64, key) {
+      // Декодируем Base64
+      const raw = atob(base64);
+      let result = '';
+      // Применяем XOR декодирование
+      for (let i = 0; i < raw.length; i++) {
+        result += String.fromCharCode(raw.charCodeAt(i) ^ key);
+      }
+      return result;
+    }
+
+    function decode() {
+      // Получаем введенные данные
+      const encodedInput = document.getElementById('encodedInput').value;
+      const key = 0x55; // Ключ для XOR декодирования
+      
+      try {
+        // Декодируем данные
+        const decodedData = decodeData(encodedInput, key);
+        // Выводим результат
+        document.getElementById('output').textContent = decodedData;
+      } catch (error) {
+        document.getElementById('output').textContent = "Ошибка декодирования: " + error.message;
+      }
+    }
+  </script>
+</body>
+</html>
