@@ -5,7 +5,7 @@ import base64
 app = Flask(__name__)
 
 # Укажите свои данные
-GITHUB_TOKEN = "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"  # Замените на ваш токен
+GITHUB_TOKEN = ""  # Замените на ваш токен
 REPO_OWNER = "dmitray27"  # Замените на ваш логин
 REPO_NAME = "esp32-telegram"  # Замените на название репозитория
 FILE_PATH = "data1.txt"  # Путь к файлу в репозитории
