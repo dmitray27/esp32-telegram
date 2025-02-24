@@ -3,61 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Отправка данных в GitHub</title>
+    <title>Данные из tem.txt</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 50px;
+            margin: 20px;
         }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+        h1 {
+            color: #333;
         }
-        textarea {
+        table {
             width: 100%;
-            height: 150px;
-            padding: 10px;
-            margin-bottom: 10px;
-        }
-        button {
-            background: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .message {
+            border-collapse: collapse;
             margin-top: 20px;
-            padding: 10px;
-            border-radius: 4px;
         }
-        .success {
-            background: #d4edda;
-            color: #155724;
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
         }
         .error {
-            background: #f8d7da;
-            color: #721c24;
+            color: red;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Отправка данных в GitHub</h1>
-        <form method="POST">
-            <textarea name="data" placeholder="Введите ваши данные..." required></textarea>
-            <button type="submit">Отправить</button>
-        </form>
+    <h1>Данные из tem.txt</h1>
 
-        {% if message %}
-            <div class="message {% if 'Ошибка' in message %}error{% else %}success{% endif %}">
-                {{ message }}
-            </div>
-        {% endif %}
-    </div>
+    {% if data.error %}
+        <p class="error">Ошибка: {{ data.error }}</p>
+    {% else %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Ключ</th>
+                    <th>Значение</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for key, value in data.items() %}
+                    <tr>
+                        <td>{{ key }}</td>
+                        <td>{{ value }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
 </body>
 </html>
