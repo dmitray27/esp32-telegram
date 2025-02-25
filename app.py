@@ -1,38 +1,41 @@
-from flask import Flask, render_templa
-te
-from datetime import datetime
+# app.py
+from flask import Flask, render_template
 import requests
+from datetime import datetime
 
 app = Flask(__name__)
 
-def get_temp_data():
-    url = "https://raw.githubusercontent.com/dmitray27/esp32-telegram/main/log_s/temp_log.txt"
+# URL сырого файла в GitHub
+DATA_URL = "https://raw.githubusercontent.com/dmitray27/esp32-telegram/main/log_s/temp_log.txt"
+
+def get_sensor_data():
     try:
-        response = requests.get(url)
-        response.raise_for_status()
-        lines = response.text.strip().split('\n')
-        last_line = lines[-1] if lines else None
+        response = requests.get(DATA_URL)
+        response.raise_for_status()  # Проверка на ошибки HTTP
         
-        if last_line:
-            parts = last_line.split(',')
-            if len(parts) >= 3:
-                return {
-                    'temp': parts[0].split(':')[-1].strip(),
-                    'date': parts[1].split(':')[-1].strip(),
-                    'time': parts[2].split(':')[-1].strip()
-                }
-        return None
-    except Exception as e:
-        print(f"Error: {e}")
-        return None
+        data = response.json()
+        
+        # Парсинг временной метки
+        dt = datetime.fromisoformat(data['timestamp'].replace('Z', '+00:00'))
+        
+        return {
+            "temperature": data['temperature'],
+            "date": dt.strftime("%Y-%m-%d"),
+            "time": dt.strftime("%H:%M:%S"),
+            "error": None
+        }
+        
+    except requests.exceptions.RequestException as e:
+        return {"error": f"Ошибка получения данных: {str(e)}"}
+    except ValueError:
+        return {"error": "Ошибка формата данных"}
+    except KeyError:
+        return {"error": "Некорректная структура данных"}
 
 @app.route('/')
 def index():
-    temp_data = get_temp_data()
-    return render_template('index.html', 
-                         temperature=temp_data['temp'] if temp_data else 'N/A',
-                         date=temp_data['date'] if temp_data else 'N/A',
-                         time=temp_data['time'] if temp_data else 'N/A')
+    sensor_data = get_sensor_data()
+    return render_template('index.html', data=sensor_data)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(debug=True)
