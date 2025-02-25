@@ -3,80 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🔥🌡️ Температурный монитор ❄️</title>
+    <title>Монитор температуры</title>
     <style>
-        /* Основные стили остаются прежними */
-        .temperature {
-            font-size: 9rem; /* Увеличен в 2 раза */
-            color: #FF6B6B; /* Новый цвет */
-            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin: 2rem 0;
-        }
-
-        .emoji-variant {
-            font-size: 4.5rem;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        .header-emoji {
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
             display: flex;
-            gap: 1rem;
             justify-content: center;
+            align-items: center;
+            margin: 0;
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
         }
 
-        /* Добавляем выравнивание по центру для всех элементов */
-        .container, .data-card, .meta-info {
+        h1 {
+            color: #4a5568;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .temperature {
+            font-size: 6rem;
+            color: #2c3e50;
+            font-weight: 300;
+            margin: 1rem 0;
+            line-height: 1;
+        }
+
+        .meta-info {
+            display: grid;
+            gap: 1rem;
+            margin-top: 2rem;
+            color: #718096;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>
-            <div class="header-emoji">
-                <span class="emoji-variant">🔥</span>
-                <span class="emoji-variant">🌡️</span>
-                <span class="emoji-variant">❄️</span>
-            </div>
-            Монитор температуры
+            <span>🌡️</span>
+            Температура
         </h1>
 
         {% if data.error %}
-            <div class="error">
-                ⚠️ Ошибка: {{ data.error }}
-            </div>
+            <div class="error">{{ data.error }}</div>
         {% else %}
-            <div class="data-card">
-                <div class="temperature">
-                    {{ data.temperature }}°C
+            <div class="temperature">{{ data.temperature }}°C</div>
+            
+            <div class="meta-info">
+                <div class="meta-item">
+                    <span>📅</span>
+                    {{ data.date }}
                 </div>
-
-                <div class="meta-info">
-                    <div class="meta-item">
-                        <div class="emoji">📅 {{ data.date }}</div>
-                        <div class="emoji-different">🗓️</div>
-                    </div>
-                    <div class="meta-item">
-                        <div class="time-emoji">
-                            {% set hour = data.time.split(':')[0] | int %}
-                            {% if 6 <= hour < 12 %}🌄{% elif 12 <= hour < 18 %}🏙️{% elif 18 <= hour < 23 %}🌆{% else %}🌃{% endif %}
-                        </div>
-                        <div class="time-container">
-                            {{ data.time }}
-                            <div class="small-emoji">⏱️</div>
-                        </div>
-                    </div>
+                <div class="meta-item">
+                    <span>🕒</span>
+                    {{ data.time }}
                 </div>
             </div>
         {% endif %}
