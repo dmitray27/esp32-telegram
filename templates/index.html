@@ -3,26 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌡️ Температурный монитор</title>
+    <title>🔥🌡️ Температурный монитор ❄️</title>
     <style>
-        /* ... (предыдущие стили остаются без изменений) ... */
-
-        .time-emoji {
-            font-size: 1.8rem;
-            animation: pulse 2s infinite;
+        /* Основные стили остаются прежними */
+        .temperature {
+            font-size: 9rem; /* Увеличен в 2 раза */
+            color: #FF6B6B; /* Новый цвет */
+            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 2rem 0;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+        .emoji-variant {
+            font-size: 4.5rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .header-emoji {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        /* Добавляем выравнивание по центру для всех элементов */
+        .container, .data-card, .meta-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>
-            <span class="emoji">🌡️</span>
+            <div class="header-emoji">
+                <span class="emoji-variant">🔥</span>
+                <span class="emoji-variant">🌡️</span>
+                <span class="emoji-variant">❄️</span>
+            </div>
             Монитор температуры
         </h1>
 
@@ -33,14 +59,13 @@
         {% else %}
             <div class="data-card">
                 <div class="temperature">
-                    <span class="emoji">🌡️</span>
                     {{ data.temperature }}°C
                 </div>
 
                 <div class="meta-info">
                     <div class="meta-item">
-                        <div class="emoji">📅</div>
-                        {{ data.date }}
+                        <div class="emoji">📅 {{ data.date }}</div>
+                        <div class="emoji-different">🗓️</div>
                     </div>
                     <div class="meta-item">
                         <div class="time-emoji">
@@ -49,7 +74,7 @@
                         </div>
                         <div class="time-container">
                             {{ data.time }}
-                            <div class="small-emoji">⌚</div>
+                            <div class="small-emoji">⏱️</div>
                         </div>
                     </div>
                 </div>
