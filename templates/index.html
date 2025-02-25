@@ -1,41 +1,60 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <title>Датчик температуры</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌡️ Температурный монитор</title>
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background: #f0f2f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
+        /* ... (предыдущие стили остаются без изменений) ... */
+
+        .time-emoji {
+            font-size: 1.8rem;
+            animation: pulse 2s infinite;
         }
 
-        .container {
-            background: white;
-            padding: 3rem;
-            border-radius: 20px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-            text-align: center;
-            width: 420px;
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            <span class="emoji">🌡️</span>
+            Монитор температуры
+        </h1>
 
-        h1 {
-            color: #2c3e50;
-            margin: 0 0 3rem 0;
-            font-size: 4rem; /* Совпадает с размером температуры */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
-        }
+        {% if data.error %}
+            <div class="error">
+                ⚠️ Ошибка: {{ data.error }}
+            </div>
+        {% else %}
+            <div class="data-card">
+                <div class="temperature">
+                    <span class="emoji">🌡️</span>
+                    {{ data.temperature }}°C
+                </div>
 
-        .title-icon {
-            font-size: 4.2rem; /* Чуть больше текста */
-            line-height: 1;
-        }
-
-        .data-box {
-            background: #
+                <div class="meta-info">
+                    <div class="meta-item">
+                        <div class="emoji">📅</div>
+                        {{ data.date }}
+                    </div>
+                    <div class="meta-item">
+                        <div class="time-emoji">
+                            {% set hour = data.time.split(':')[0] | int %}
+                            {% if 6 <= hour < 12 %}🌄{% elif 12 <= hour < 18 %}🏙️{% elif 18 <= hour < 23 %}🌆{% else %}🌃{% endif %}
+                        </div>
+                        <div class="time-container">
+                            {{ data.time }}
+                            <div class="small-emoji">⌚</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
