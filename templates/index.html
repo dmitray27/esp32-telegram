@@ -15,91 +15,27 @@
 
         .container {
             background: white;
-            padding: 2.5rem;
-            border-radius: 16px;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
             text-align: center;
-            width: 380px;
+            width: 420px;
         }
 
         h1 {
             color: #2c3e50;
-            margin-bottom: 2rem;
-            font-size: 2.2rem;
-            letter-spacing: -0.5px;
+            margin: 0 0 3rem 0;
+            font-size: 4rem; /* Совпадает с размером температуры */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
         }
 
-        .data-box {
-            background: #f8f9fa;
-            padding: 2rem;
-            border-radius: 12px;
-            margin: 1.5rem 0;
-        }
-
-        .temperature {
-            font-size: 4rem;  /* Огромная температура */
-            color: #e74c3c;
-            font-weight: 800;
-            margin: 1.5rem 0;
+        .title-icon {
+            font-size: 4.2rem; /* Чуть больше текста */
             line-height: 1;
         }
 
-        .time-section {
-            margin-top: 2rem;
-            font-size: 1.8rem;  /* Размер как в газетном заголовке */
-        }
-
-        .date {
-            color: #2c3e50;
-            display: block;
-            margin-bottom: 1rem;
-            font-weight: 600;
-        }
-
-        .time {
-            color: #34495e;
-            font-weight: 500;
-            display: block;
-        }
-
-        .error {
-            color: #c0392b;
-            background: #f8d7da;
-            padding: 1.5rem;
-            border-radius: 12px;
-            font-size: 1.2rem;
-        }
-
-        /* Иконки-гиганты */
-        .icon {
-            font-size: 2.2rem;  /* Размер с эмодзи в мессенджерах */
-            vertical-align: middle;
-            margin-right: 0.8rem;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>📡 Показания датчика</h1>
-        
-        {% if data.error %}
-            <div class="error">{{ data.error }}</div>
-        {% else %}
-            <div class="data-box">
-                <div class="temperature">{{ data.temperature }}°C</div>
-                
-                <div class="time-section">
-                    <span class="date">
-                        <span class="icon">📆</span>
-                        {{ data.date }}
-                    </span>
-                    <span class="time">
-                        <span class="icon">⏱</span>
-                        {{ data.time }}
-                    </span>
-                </div>
-            </div>
-        {% endif %}
-    </div>
-</body>
-</html>
+        .data-box {
+            background: #
