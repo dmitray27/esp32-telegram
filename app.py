@@ -6,7 +6,7 @@ from datetime import datetime
 app = Flask(__name__)
 
 # URL сырого файла в GitHub
-DATA_URL = "https://raw.githubusercontent.com/dmitray27/esp32-telegram/main/log_s/temp_log.txt"
+DATA_URL = "https://raw.githubusercontent.com/dmitray27/esp32-telegram/main/tem.txt"
 
 def get_sensor_data():
     try:
