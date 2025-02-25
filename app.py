@@ -2,24 +2,28 @@
 from flask import Flask, render_template
 from datetime import datetime
 import os
+import json
 
 app = Flask(__name__)
 
-# Путь к локальному файлу tem.txt
 DATA_FILE = os.path.join(os.path.dirname(__file__), 'tem.txt')
 
 def get_sensor_data():
     try:
-        # Читаем данные из локального файла
         with open(DATA_FILE, 'r') as f:
-            content = f.read().strip().split(',')
+            raw_data = f.read().strip()
             
-            # Проверяем формат данных (ожидаем: температура,timestamp)
-            if len(content) != 2:
-                return {"error": "Некорректный формат файла"}
+            # Парсим JSON-данные
+            data = json.loads(raw_data)
+            
+            # Извлекаем значения
+            temperature = data.get('temperature')
+            timestamp = data.get('timestamp')
+            
+            # Проверяем наличие ключей
+            if not temperature or not timestamp:
+                return {"error": "Некорректная структура JSON"}
                 
-            temperature, timestamp = content
-            
             # Парсим временную метку
             dt = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
             
@@ -32,8 +36,10 @@ def get_sensor_data():
             
     except FileNotFoundError:
         return {"error": "Файл tem.txt не найден"}
+    except json.JSONDecodeError:
+        return {"error": "Ошибка декодирования JSON"}
     except ValueError as e:
-        return {"error": f"Ошибка формата данных: {str(e)}"}
+        return {"error": f"Ошибка формата времени: {str(e)}"}
     except Exception as e:
         return {"error": f"Неизвестная ошибка: {str(e)}"}
 
