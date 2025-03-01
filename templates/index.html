@@ -148,47 +148,4 @@
             {% endfor %}
         </div>
 
-        <div class="refresh-indicator" id="refreshIndicator"></div>
-    </div>
-
-    <script>
-        async function refreshData() {
-            const indicator = document.getElementById('refreshIndicator');
-            indicator.style.width = '100%';
-
-            try {
-                const response = await fetch(window.location.href, {
-                    headers: {
-                        'Cache-Control': 'no-cache'
-                    }
-                });
-
-                if (!response.ok) throw new Error(`Ошибка HTTP: ${response.status}`);
-
-                const html = await response.text();
-                const parser = new DOMParser();
-                const newDoc = parser.parseFromString(html, 'text/html');
-                const newContent = newDoc.getElementById('content').innerHTML;
-                const newHistory = newDoc.querySelector('.history').innerHTML;
-
-                document.getElementById('content').innerHTML = newContent;
-                document.querySelector('.history').innerHTML = newHistory;
-                console.log("Данные успешно обновлены");
-
-            } catch (error) {
-                console.error('Ошибка обновления:', error);
-                document.getElementById('content').innerHTML = `
-                    <div class="error">Ошибка загрузки данных: ${error.message}</div>
-                `;
-            } finally {
-                setTimeout(() => {
-                    indicator.style.width = '0%';
-                }, 10000); // Синхронизировано с интервалом
-            }
-        }
-
-        setInterval(refreshData, 10000);
-        setTimeout(refreshData, 100);
-    </script>
-</body>
-</html>
+        <div class="refresh-indicator" id="refresh
