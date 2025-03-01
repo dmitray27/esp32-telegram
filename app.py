@@ -9,31 +9,35 @@ DATA_URL = "https://raw.githubusercontent.com/dmitray27/esp32-telegram/main/tem.
 
 def get_sensor_data():
     try:
-        response = requests.get(DATA_URL)
-        response.raise_for_status()
+        print(f"\n[{datetime.now()}] Инициирован запрос к GitHub")
+        response = requests.get(
+            DATA_URL,
+            headers={'Cache-Control': 'no-cache'}
+        )
+        print(f"[{datetime.now()}] Ответ получен. Код: {response.status_code}")
+        print(f"Заголовки ответа: {dict(response.headers)}")
+        
         raw_data = response.text.strip()
+        print(f"Сырые данные: {raw_data}")
+        
         data = json.loads(raw_data)
-
-        temperature = data.get('temperature')
-        timestamp = data.get('timestamp')
-
-        if not temperature or not timestamp:
-            return {"error": "Некорректные данные в файле"}
-
-        dt = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
-
+        
+        if 'temperature' not in data or 'timestamp' not in data:
+            return {"error": "Некорректные данные: отсутствуют ключи"}
+            
+        dt = datetime.fromisoformat(data['timestamp'].replace('Z', '+00:00'))
+        
         return {
-            "temperature": temperature,
+            "temperature": data['temperature'],
             "date": dt.strftime("%Y-%m-%d"),
             "time": dt.strftime("%H:%M:%S"),
             "error": None
         }
 
-    except requests.exceptions.RequestException as e:
-        return {"error": f"Ошибка подключения: {str(e)}"}
-    except json.JSONDecodeError:
-        return {"error": "Ошибка формата данных"}
     except Exception as e:
+        import traceback
+        print(f"\n[ERROR] {datetime.now()}")
+        print(traceback.format_exc())
         return {"error": f"Системная ошибка: {str(e)}"}
 
 @app.route('/')
@@ -47,4 +51,4 @@ def data():
     return jsonify(sensor_data)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000, debug=True)
