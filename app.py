@@ -10,7 +10,7 @@ def fetch_github_data():
     try:
         response = requests.get(
             GITHUB_URL,
-            timeout=3,
+            timeout=10,
             headers={'Cache-Control': 'no-cache'}  # Явное отключение кэша GitHub
         )
         response.raise_for_status()  # Генерирует исключение для 4xx/5xx статусов
