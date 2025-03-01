@@ -23,7 +23,7 @@ def get_sensor_data():
             headers={'Cache-Control': 'no-cache'}
         )
         print(f"[{datetime.now()}] Ответ получен. Код: {response.status_code}")
-        print(f"Заголовки ответа: {json.dumps(dict(response.headers), ensure_ascii=False}")
+        print(f"Заголовки ответа: {json.dumps(dict(response.headers), ensure_ascii=False)}")
 
         raw_data = response.text.strip()
         print(f"Сырые данные: {raw_data}")
