@@ -2,18 +2,22 @@ from flask import Flask, render_template
 from datetime import datetime
 import requests
 import json
+from collections import deque
 
 app = Flask(__name__)
 GITHUB_URL = "https://raw.githubusercontent.com/dmitray27/esp32-telegram/main/tem.txt"
+
+# Ограничим историю последними 10 записями
+data_history = deque(maxlen=10)
 
 def fetch_github_data():
     try:
         response = requests.get(
             GITHUB_URL,
-            timeout=10,
-            headers={'Cache-Control': 'no-cache'}  # Явное отключение кэша GitHub
+            timeout=3,
+            headers={'Cache-Control': 'no-cache'}
         )
-        response.raise_for_status()  # Генерирует исключение для 4xx/5xx статусов
+        response.raise_for_status()
         return response.text.strip()
     except requests.RequestException as e:
         raise Exception(f"Ошибка получения данных: {str(e)}")
@@ -44,10 +48,11 @@ def index():
     try:
         raw_data = fetch_github_data()
         sensor_data = parse_sensor_data(raw_data)
+        data_history.append(sensor_data)  # Добавляем данные в историю
     except Exception as e:
         sensor_data = {'error': str(e)}
 
-    return render_template('index.html', data=sensor_data)
+    return render_template('index.html', data=sensor_data, history=list(data_history))
 
 if __name__ == '__main__':
-    app.run(debug=False)  # В продакшене debug должен быть False
+    app.run(debug=False)
