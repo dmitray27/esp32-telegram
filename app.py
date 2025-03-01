@@ -5,7 +5,7 @@ import json
 from collections import deque
 
 app = Flask(__name__)
-GITHUB_URL = "https://raw.githubusercontent.com/dmitray27/esp32-telegram/main/tem.txt"
+GITHUB_URL = "https://raw.githubusercontent.com/dmitray27/esp32/main/tem.txt"
 
 # Ограничим историю последними 10 записями
 data_history = deque(maxlen=10)
