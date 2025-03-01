@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Монитор температуры</title>
     <style>
+        /* Существующие стили */
         :root {
             --text-primary: #1a1a1a;
             --text-secondary: #4a4a4a;
@@ -85,6 +86,29 @@
             margin-top: 1.5rem;
             border-radius: 2px;
         }
+
+        /* Новые стили для истории */
+        .history {
+            margin-top: 2rem;
+            text-align: left;
+        }
+
+        .history h2 {
+            font-size: 1.25rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
@@ -112,15 +136,27 @@
                 </div>
             {% endif %}
         </div>
+
+        <!-- Блок истории данных -->
+        <div class="history">
+            <h2>История измерений</h2>
+            {% for entry in history %}
+                <div class="history-item">
+                    <span>{{ entry.temperature }}°C</span>
+                    <span>{{ entry.date }} {{ entry.time }}</span>
+                </div>
+            {% endfor %}
+        </div>
+
         <div class="refresh-indicator" id="refreshIndicator"></div>
     </div>
 
     <script>
         async function refreshData() {
-            try {
-                const indicator = document.getElementById('refreshIndicator');
-                indicator.style.width = '100%';
+            const indicator = document.getElementById('refreshIndicator');
+            indicator.style.width = '100%';
 
+            try {
                 const response = await fetch(window.location.href, {
                     headers: {
                         'Cache-Control': 'no-cache'
@@ -133,14 +169,21 @@
                 const parser = new DOMParser();
                 const newDoc = parser.parseFromString(html, 'text/html');
                 const newContent = newDoc.getElementById('content').innerHTML;
+                const newHistory = newDoc.querySelector('.history').innerHTML;
 
                 document.getElementById('content').innerHTML = newContent;
+                document.querySelector('.history').innerHTML = newHistory;
+                console.log("Данные успешно обновлены");
 
             } catch (error) {
                 console.error('Ошибка обновления:', error);
+                document.getElementById('content').innerHTML = `
+                    <div class="error">Ошибка загрузки данных: ${error.message}</div>
+                `;
             } finally {
-                const indicator = document.getElementById('refreshIndicator');
-                indicator.style.width = '0%';
+                setTimeout(() => {
+                    indicator.style.width = '0%';
+                }, 10000); // Синхронизировано с интервалом
             }
         }
 
