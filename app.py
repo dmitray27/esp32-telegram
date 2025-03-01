@@ -6,7 +6,7 @@ import json
 
 app = Flask(__name__)
 
-DATA_FILE = os.path.join(os.path.dirname(__file__), 'tem.txt')
+#DATA_FILE = os.path.join(os.path.dirname(__file__), 'tem.txt')
 
 def get_sensor_data():
     try:
