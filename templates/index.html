@@ -88,6 +88,16 @@
             border-radius: 8px;
             margin-top: 1rem;
         }
+        
+        button {
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            margin-top: 1rem;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -120,20 +130,32 @@
     </div>
 
     <script>
+        let retryCount = 0;
+        const MAX_RETRIES = 3;
+        let updateInterval;
+
         function updateData() {
             const loader = document.querySelector('.loading-indicator');
             const contentDiv = document.getElementById('content');
             
+            console.log('[DEBUG] Запрос данных...');
             loader.style.display = 'block';
             
-            fetch(`/data?t=${new Date().getTime()}`, { 
-                cache: 'no-cache' 
+            fetch(`/data?t=${Date.now()}`, {
+                cache: 'no-cache',
+                headers: {
+                    'Cache-Control': 'no-cache'
+                }
             })
             .then(response => {
-                if (!response.ok) throw new Error('Ошибка сети');
+                console.log('Статус:', response.status);
+                if (!response.ok) throw new Error(`Ошибка HTTP: ${response.status}`);
                 return response.json();
             })
             .then(data => {
+                console.log('Данные:', data);
+                retryCount = 0;
+                
                 if (data.error) {
                     contentDiv.innerHTML = `<div class="error">${data.error}</div>`;
                 } else {
@@ -153,15 +175,39 @@
                 }
             })
             .catch(error => {
-                contentDiv.innerHTML = `<div class="error">Ошибка получения данных: ${error.message}</div>`;
+                console.error('Ошибка:', error);
+                if(retryCount < MAX_RETRIES) {
+                    retryCount++;
+                    console.log(`Повтор #${retryCount}`);
+                    setTimeout(updateData, 1000);
+                } else {
+                    contentDiv.innerHTML = `
+                        <div class="error">
+                            ${error.message}<br>
+                            <button onclick="location.reload()">Перезагрузить</button>
+                        </div>
+                    `;
+                    clearInterval(updateInterval);
+                }
             })
             .finally(() => {
                 loader.style.display = 'none';
             });
         }
 
+        // Первый запрос
         updateData();
-        setInterval(updateData, 3000);
+        
+        // Интервал обновления
+        updateInterval = setInterval(updateData, 3000);
+        
+        // Ручное обновление по клику
+        document.addEventListener('click', () => {
+            console.log('Принудительное обновление');
+            clearInterval(updateInterval);
+            updateData();
+            updateInterval = setInterval(updateData, 3000);
+        });
     </script>
 </body>
 </html>
