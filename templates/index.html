@@ -3,166 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Умный термометр</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet>
+    <title>Монитор температуры</title>
     <style>
         :root {
-            --primary: #2E86C1;
-            --background: #1A2330;
-            --card-bg: #243241;
-            --text: #FFFFFF;
-            --error: #E74C3C;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+            --text-primary: #2d3748;
+            --text-secondary: #718096;
+            --bg-primary: #f7fafc;
+            --accent: #4299e1;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background: var(--background);
-            color: var(--text);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg-primary);
             min-height: 100vh;
+            margin: 0;
             display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: center;
+            transition: background 0.3s ease;
         }
 
         .container {
-            background: var(--card-bg);
-            border-radius: 20px;
+            background: white;
             padding: 2rem;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            transition: transform 0.3s ease;
-        }
-
-        .loading-bar {
-            height: 3px;
-            background: var(--primary);
-            width: 0%;
-            transition: width 0.3s ease;
-            margin-bottom: 1.5rem;
-        }
-
-        .loading-bar.active {
-            animation: loading 1.5s infinite;
-        }
-
-        .temperature-display {
+            border-radius: 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            width: min(90%, 400px);
             text-align: center;
-            margin: 2rem 0;
+            transition: transform 0.2s ease;
         }
 
-        .temperature-value {
-            font-size: 4rem;
-            font-weight: 600;
-            background: linear-gradient(45deg, #2E86C1, #4AA3DF);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .meta-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        .meta-card {
-            background: rgba(255,255,255,0.05);
-            padding: 1rem;
-            border-radius: 12px;
+        h1 {
+            color: var(--text-primary);
+            margin: 0 0 1.5rem;
+            font-size: 1.75rem;
             display: flex;
             align-items: center;
-            gap: 0.8rem;
+            justify-content: center;
+            gap: 0.75rem;
         }
 
-        .error-box {
-            color: var(--error);
-            padding: 1rem;
-            background: rgba(231,76,60,0.1);
-            border-radius: 12px;
+        .temperature {
+            font-size: 4.5rem;
+            font-weight: 300;
+            color: var(--text-primary);
             margin: 1rem 0;
-            display: none;
+            line-height: 1;
+            opacity: 0.9;
         }
 
-        .retry-button {
-            background: var(--primary);
-            border: none;
-            padding: 0.8rem 1.5rem;
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-            transition: opacity 0.2s;
+        .meta-info {
+            display: grid;
+            gap: 1rem;
+            margin-top: 2rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
         }
 
-        @keyframes loading {
-            0% { width: 0%; }
-            50% { width: 90%; }
-            100% { width: 0%; margin-left: 100%; }
+        .meta-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .error {
+            color: #e53e3e;
+            padding: 1rem;
+            background: #fff5f5;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .refresh-indicator {
+            height: 3px;
+            background: var(--accent);
+            width: 0%;
+            transition: width 5s linear;
+            margin-top: 1rem;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="loading-bar"></div>
-        
-        <div class="temperature-display">
-            <div class="temperature-value">--.-°C</div>
-        </div>
+        <h1>
+            <span>🌡️</span>
+            Температура
+        </h1>
 
-        <div class="meta-grid">
-            <div class="meta-card">
-                <span>📅</span>
-                <div id="date">--.--.----</div>
-            </div>
-            <div class="meta-card">
-                <span>🕒</span>
-                <div id="time">--:--:--</div>
-            </div>
+        <div id="content">
+            {% if data.error %}
+                <div class="error">{{ data.error }}</div>
+            {% else %}
+                <div class="temperature">{{ data.temperature }}°C</div>
+                <div class="meta-info">
+                    <div class="meta-item">
+                        <span>📅</span>
+                        {{ data.date }}
+                    </div>
+                    <div class="meta-item">
+                        <span>🕒</span>
+                        {{ data.time }}
+                    </div>
+                </div>
+            {% endif %}
         </div>
-
-        <div class="error-box" id="error-container"></div>
+        <div class="refresh-indicator" id="refreshIndicator"></div>
     </div>
 
     <script>
-        let abortController = null;
-        const loadingBar = document.querySelector('.loading-bar');
-        const errorContainer = document.getElementById('error-container');
-        
-        async function fetchData() {
+        // Функция для плавного обновления данных
+        async function refreshData() {
             try {
-                if(abortController) abortController.abort();
-                abortController = new AbortController();
-                
-                loadingBar.classList.add('active');
-                errorContainer.style.display = 'none';
+                // Показываем индикатор обновления
+                const indicator = document.getElementById('refreshIndicator');
+                indicator.style.width = '100%';
 
-                const response = await fetch('/data?_=' + Date.now(), {
-                    signal: abortController.signal
+                const response = await fetch(window.location.href, {
+                    headers: {
+                        'Cache-Control': 'no-cache'
+                    }
                 });
-                
-                if(!response.ok) throw new Error(`HTTP Error ${response.status}`);
-                
-                const data = await response.json();
-                
-                if(data.error) throw new Error(data.error);
-                
-                updateUI(data);
-            } catch(err) {
-                if(err.name === 'AbortError') return;
-                showError(err.message);
+
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+                const html = await response.text();
+                const parser = new DOMParser();
+                const newDoc = parser.parseFromString(html, 'text/html');
+                const newContent = newDoc.getElementById('content').innerHTML;
+
+                // Плавное обновление контента
+                document.getElementById('content').innerHTML = newContent;
+
+            } catch (error) {
+                console.error('Ошибка обновления:', error);
             } finally {
-                loadingBar.classList.remove('active');
-                abortController = null;
+                // Сбрасываем индикатор
+                indicator.style.width = '0%';
             }
         }
 
-        function updateUI(data) {
-            document.querySelector('.temperature-value').textContent = 
-                `${data.temperature.toFixed(1)}${data.unit}`;
-            document.getElementById('date
+        // Обновляем каждые 5 секунд
+        setInterval(refreshData, 5000);
+
+        // Первое обновление через 100ms после загрузки
+        setTimeout(refreshData, 100);
+    </script>
+</body>
+</html>
