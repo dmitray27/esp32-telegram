@@ -10,9 +10,7 @@ DATA_URL = "https://raw.githubusercontent.com/dmitray27/esp32-telegram/main/tem.
 
 def fix_timestamp_format(timestamp_str):
     match = re.match(r"(\d{4}-\d{2}-)(\d{2})(\d{1,2}:\d{2}:\d{2}[+-]\d{4})", timestamp_str)
-    if match:
-        return f"{match.group(1)}{match.group(2)} {match.group(3)}"
-    return timestamp_str
+    return f"{match.group(1)}{match.group(2)} {match.group(3)}" if match else timestamp_str
 
 def get_sensor_data():
     try:
@@ -22,13 +20,15 @@ def get_sensor_data():
             timeout=5
         )
         response.raise_for_status()
-
-        raw_data = response.text.strip()
+        
+        raw_data = response.text.lstrip('\ufeff').strip()
+        print(f"Raw data received:\n{raw_data}")  # Для диагностики
+        
         data = json.loads(raw_data)
 
         if not isinstance(data.get('temperature'), (float, int)):
-            return {"error": "Некорректные данные температуры"}
-
+            raise ValueError("Некорректный формат температуры")
+            
         fixed_timestamp = fix_timestamp_format(data['timestamp'])
         dt = datetime.fromisoformat(fixed_timestamp.replace('Z', '+00:00'))
 
@@ -40,19 +40,19 @@ def get_sensor_data():
             "error": None
         }
 
-    except (json.JSONDecodeError, KeyError) as e:
-        return {"error": f"Ошибка данных: {str(e)}"}
+    except json.JSONDecodeError as e:
+        return {"error": f"Ошибка формата JSON: {str(e)}"}
     except requests.exceptions.RequestException as e:
-        return {"error": f"Ошибка сети: {str(e)}"}
+        return {"error": f"Сетевая ошибка: {str(e)}"}
     except Exception as e:
-        return {"error": f"Системная ошибка: {str(e)}"}
+        return {"error": f"Ошибка обработки: {str(e)}"}
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
 @app.route('/data')
-def data():
+def api_data():
     return jsonify(get_sensor_data())
 
 if __name__ == '__main__':
