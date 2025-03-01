@@ -3,111 +3,238 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Монитор температуры</title>
+    <title>Умный термометр</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        /* ... (стили остаются без изменений) ... */
+        :root {
+            --primary: #2E86C1;
+            --background: #1A2330;
+            --card-bg: #243241;
+            --text: #FFFFFF;
+            --error: #E74C3C;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading-container {
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            display: none;
+        }
+
+        .loading-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--primary);
+            transition: width 0.3s ease;
+            animation: loading 1.5s infinite;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .temperature-container {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .temperature {
+            font-size: 4rem;
+            font-weight: 600;
+            background: linear-gradient(45deg, #2E86C1, #4AA3DF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 10px rgba(46,134,193,0.3);
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .meta-card {
+            background: rgba(255,255,255,0.05);
+            padding: 1rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .meta-card span {
+            font-size: 1.4rem;
+        }
+
+        .error {
+            color: var(--error);
+            text-align: center;
+            padding: 1rem;
+            background: rgba(231,76,60,0.1);
+            border-radius: 12px;
+            margin: 1rem 0;
+        }
+
+        .retry-button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 1rem;
+        }
+
+        .retry-button:active {
+            transform: scale(0.95);
+        }
+
+        @keyframes loading {
+            0% { width: 0%; margin-left: 0; }
+            50% { width: 90%; }
+            100% { width: 0%; margin-left: 100%; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="loading-indicator"></div>
+        <div class="loading-container">
+            <div class="loading-bar"></div>
+        </div>
 
-        <h1>
-            <span>🌡️</span>
-            Температура
-        </h1>
+        <div class="header">
+            <h1>🌡️ Умный термометр</h1>
+        </div>
 
         <div id="content">
-            {% if data.error %}
-                <div class="error">{{ data.error }}</div>
-            {% else %}
-                <div class="temperature">{{ "%.1f"|format(data.temperature) }}°C</div>
+            <div class="temperature-container">
+                <div class="temperature">--.-°C</div>
+            </div>
 
-                <div class="meta-info">
-                    <div class="meta-item">
-                        <span>📅</span>
-                        {{ data.date }}
-                    </div>
-                    <div class="meta-item">
-                        <span>🕒</span>
-                        {{ data.time }}
-                    </div>
+            <div class="meta-grid">
+                <div class="meta-card">
+                    <span>📅</span>
+                    <div id="date">--.--.----</div>
                 </div>
-            {% endif %}
+                <div class="meta-card">
+                    <span>🕒</span>
+                    <div id="time">--:--:--</div>
+                </div>
+            </div>
         </div>
+
+        <div id="error-container" class="error" style="display: none;"></div>
     </div>
 
     <script>
-        let retryCount = 0;
-        const MAX_RETRIES = 3;
-        let updateInterval;
+        let currentRequest = null;
+        const container = document.querySelector('.container');
+        const loadingContainer = document.querySelector('.loading-container');
+        const errorContainer = document.getElementById('error-container');
 
-        function updateData() {
-            const loader = document.querySelector('.loading-indicator');
-            const contentDiv = document.getElementById('content');
+        async function updateData() {
+            try {
+                if(currentRequest) currentRequest.abort();
+                
+                loadingContainer.style.display = 'block';
+                errorContainer.style.display = 'none';
+                
+                currentRequest = new AbortController();
+                const response = await fetch(`/data?t=${Date.now()}`, {
+                    signal: currentRequest.signal
+                });
 
-            console.log('[DEBUG] Запрос данных...');
-            loader.style.display = 'block';
-
-            fetch(`/data?t=${Date.now()}`)
-            .then(response => {
-                console.log('Статус:', response.status);
-                if (!response.ok) throw new Error(`Ошибка HTTP: ${response.status}`);
-                return response.json();
-            })
-            .then(data => {
-                console.log('Данные:', data);
-                retryCount = 0;
-
-                if (data.error) {
-                    contentDiv.innerHTML = `<div class="error">${data.error}</div>`;
-                } else {
-                    contentDiv.innerHTML = `
-                        <div class="temperature">${data.temperature.toFixed(1)}°C</div>
-                        <div class="meta-info">
-                            <div class="meta-item">
-                                <span>📅</span>
-                                ${data.date}
-                            </div>
-                            <div class="meta-item">
-                                <span>🕒</span>
-                                ${data.time}
-                            </div>
-                        </div>
-                    `;
-                }
-            })
-            .catch(error => {
-                console.error('Ошибка:', error);
-                if(retryCount < MAX_RETRIES) {
-                    retryCount++;
-                    console.log(`Повтор #${retryCount}`);
-                    setTimeout(updateData, 1000);
-                } else {
-                    contentDiv.innerHTML = `
-                        <div class="error">
-                            ${error.message}<br>
-                            <button onclick="location.reload()">Перезагрузить</button>
-                        </div>
-                    `;
-                    clearInterval(updateInterval);
-                }
-            })
-            .finally(() => {
-                loader.style.display = 'none';
-            });
+                if(!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+                
+                const data = await response.json();
+                
+                if(data.error) throw new Error(data.error);
+                
+                updateUI(data);
+            } catch (err) {
+                if(err.name === 'AbortError') return;
+                showError(err.message);
+            } finally {
+                loadingContainer.style.display = 'none';
+                currentRequest = null;
+            }
         }
 
-        // Первый запрос
-        updateData();
-        updateInterval = setInterval(updateData, 3000);
+        function updateUI(data) {
+            document.querySelector('.temperature').textContent = 
+                `${Number(data.temperature).toFixed(1)}${data.unit}`;
+            document.getElementById('date').textContent = data.date;
+            document.getElementById('time').textContent = data.time;
+        }
 
-        // Ручное обновление по клику
-        document.addEventListener('click', () => {
-            console.log('Принудительное обновление');
-            clearInterval(updateInterval);
-            updateData();
-            updateInterval = setInterval(updateData, 3000);
+        function showError(message) {
+            errorContainer.style.display = 'block';
+            errorContainer.innerHTML = `
+                ${message}<br>
+                <button class="retry-button" onclick="updateData()">Повторить</button>
+            `;
+        }
+
+        // Инициализация
+        updateData();
+        setInterval(updateData, 3000);
+
+        // Интерактивные эффекты
+        container.addEventListener('mousemove', (e) => {
+            const rect = container.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            container.style.transform = `
+                perspective(1000px)
+                rotateX(${(y - rect.height/2) * 0.02}deg)
+                rotateY(${(x - rect.width/2) * -0.02}deg)
+            `;
+        });
+
+        container.addEventListener('mouseleave', () => {
+            container.style.transform = 'none';
         });
     </script>
 </body>
