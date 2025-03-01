@@ -6,9 +6,8 @@ import json
 
 app = Flask(__name__)
 
-#DATA_FILE = os.path.join(os.path.dirname(__file__), 'tem.txt')
+DATA_FILE = os.path.join(os.path.dirname(__file__), 'tem.txt')
 
-GITHUB_URL = "https://raw.githubusercontent.com/dmitray27/esp32/main/tem.txt"
 
 def get_sensor_data():
     try:
