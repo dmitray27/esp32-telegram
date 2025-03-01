@@ -6,14 +6,15 @@
     <title>Монитор температуры</title>
     <style>
         :root {
-            --text-primary: #2d3748;
-            --text-secondary: #718096;
-            --bg-primary: #f7fafc;
-            --accent: #4299e1;
+            --text-primary: #1a1a1a;
+            --text-secondary: #4a4a4a;
+            --bg-primary: #f0f4f8;
+            --accent: #007bff;
+            --error: #dc3545;
         }
 
         body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-family: 'Inter', system-ui, sans-serif;
             background: var(--bg-primary);
             min-height: 100vh;
             margin: 0;
@@ -25,9 +26,9 @@
 
         .container {
             background: white;
-            padding: 2rem;
-            border-radius: 1rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             width: min(90%, 400px);
             text-align: center;
             transition: transform 0.2s ease;
@@ -36,7 +37,7 @@
         h1 {
             color: var(--text-primary);
             margin: 0 0 1.5rem;
-            font-size: 1.75rem;
+            font-size: 2rem;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -44,10 +45,10 @@
         }
 
         .temperature {
-            font-size: 4.5rem;
+            font-size: 5rem;
             font-weight: 300;
             color: var(--text-primary);
-            margin: 1rem 0;
+            margin: 1.5rem 0;
             line-height: 1;
             opacity: 0.9;
         }
@@ -57,7 +58,7 @@
             gap: 1rem;
             margin-top: 2rem;
             color: var(--text-secondary);
-            font-size: 0.9rem;
+            font-size: 0.95rem;
         }
 
         .meta-item {
@@ -68,27 +69,30 @@
         }
 
         .error {
-            color: #e53e3e;
+            color: var(--error);
             padding: 1rem;
             background: #fff5f5;
             border-radius: 0.5rem;
             margin: 1rem 0;
+            font-size: 0.9rem;
         }
 
         .refresh-indicator {
-            height: 3px;
+            height: 4px;
             background: var(--accent);
             width: 0%;
-            transition: width 5s linear;
-            margin-top: 1rem;
+            transition: width 3s linear;
+            margin-top: 1.5rem;
+            border-radius: 2px;
         }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
         <h1>
             <span>🌡️</span>
-            Температура
+            Монитор температуры
         </h1>
 
         <div id="content">
@@ -112,10 +116,8 @@
     </div>
 
     <script>
-        // Функция для плавного обновления данных
         async function refreshData() {
             try {
-                // Показываем индикатор обновления
                 const indicator = document.getElementById('refreshIndicator');
                 indicator.style.width = '100%';
 
@@ -125,28 +127,24 @@
                     }
                 });
 
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                if (!response.ok) throw new Error(`Ошибка HTTP: ${response.status}`);
 
                 const html = await response.text();
                 const parser = new DOMParser();
                 const newDoc = parser.parseFromString(html, 'text/html');
                 const newContent = newDoc.getElementById('content').innerHTML;
 
-                // Плавное обновление контента
                 document.getElementById('content').innerHTML = newContent;
 
             } catch (error) {
                 console.error('Ошибка обновления:', error);
             } finally {
-                // Сбрасываем индикатор
+                const indicator = document.getElementById('refreshIndicator');
                 indicator.style.width = '0%';
             }
         }
 
-        // Обновляем каждые 5 секунд
-        setInterval(refreshData, 5000);
-
-        // Первое обновление через 100ms после загрузки
+        setInterval(refreshData, 3000);
         setTimeout(refreshData, 100);
     </script>
 </body>
