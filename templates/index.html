@@ -56,31 +56,112 @@
             justify-content: center;
             gap: 0.5rem;
         }
+
+        .loading-indicator {
+            display: none;
+            height: 4px;
+            background-color: #e2e8f0;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .loading-indicator::after {
+            content: '';
+            position: absolute;
+            left: -40%;
+            width: 40%;
+            height: 100%;
+            background-color: #4299e1;
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { left: -40%; }
+            100% { left: 100%; }
+        }
+
+        .error {
+            color: #e53e3e;
+            padding: 1rem;
+            background: #fff5f5;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="loading-indicator"></div>
+        
         <h1>
             <span>🌡️</span>
             Температура
         </h1>
 
-        {% if data.error %}
-            <div class="error">{{ data.error }}</div>
-        {% else %}
-            <div class="temperature">{{ data.temperature }}°C</div>
-            
-            <div class="meta-info">
-                <div class="meta-item">
-                    <span>📅</span>
-                    {{ data.date }}
+        <div id="content">
+            {% if data.error %}
+                <div class="error">{{ data.error }}</div>
+            {% else %}
+                <div class="temperature">{{ data.temperature }}°C</div>
+
+                <div class="meta-info">
+                    <div class="meta-item">
+                        <span>📅</span>
+                        {{ data.date }}
+                    </div>
+                    <div class="meta-item">
+                        <span>🕒</span>
+                        {{ data.time }}
+                    </div>
                 </div>
-                <div class="meta-item">
-                    <span>🕒</span>
-                    {{ data.time }}
-                </div>
-            </div>
-        {% endif %}
+            {% endif %}
+        </div>
     </div>
+
+    <script>
+        function updateData() {
+            const loader = document.querySelector('.loading-indicator');
+            const contentDiv = document.getElementById('content');
+            
+            loader.style.display = 'block';
+            
+            fetch(`/data?t=${new Date().getTime()}`, { 
+                cache: 'no-cache' 
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Ошибка сети');
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    contentDiv.innerHTML = `<div class="error">${data.error}</div>`;
+                } else {
+                    contentDiv.innerHTML = `
+                        <div class="temperature">${data.temperature}°C</div>
+                        <div class="meta-info">
+                            <div class="meta-item">
+                                <span>📅</span>
+                                ${data.date}
+                            </div>
+                            <div class="meta-item">
+                                <span>🕒</span>
+                                ${data.time}
+                            </div>
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                contentDiv.innerHTML = `<div class="error">Ошибка получения данных: ${error.message}</div>`;
+            })
+            .finally(() => {
+                loader.style.display = 'none';
+            });
+        }
+
+        updateData();
+        setInterval(updateData, 3000);
+    </script>
 </body>
 </html>
