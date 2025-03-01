@@ -4,7 +4,7 @@ import requests
 import json
 
 app = Flask(__name__)
-GITHUB_URL = "https://raw.githubusercontent.com/dmitray27/esp32/main/tem.txt"
+GITHUB_URL = "https://raw.githubusercontent.com/dmitray27/esp32-telegram/main/tem.txt"
 
 def fetch_github_data():
     try:
