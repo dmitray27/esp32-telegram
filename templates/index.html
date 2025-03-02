@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Монитор температуры</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
         :root {
             --text-primary: #e0e0e0;
             --text-secondary: #a0a0a0;
             --bg-primary: #1a1a1a;
             --accent: #8b0000;
-            --font-primary: 'MedievalSharp', cursive;
+            --font-primary: 'Roboto', sans-serif; /* Новый шрифт */
         }
 
-        /* Шрифт для всех элементов внутри контейнера */
-        .container * {
+        /* Шрифт для всех элементов */
+        body, .container * {
             font-family: var(--font-primary) !important;
             letter-spacing: 0.5px;
         }
@@ -43,12 +43,14 @@
         h1 {
             margin: 0 0 1.5rem;
             font-size: 2rem;
+            font-weight: 700; /* Полужирный */
         }
 
         .temperature {
             font-size: 5rem;
             color: var(--accent);
             margin: 1rem 0;
+            font-weight: 400; /* Обычный */
         }
 
         .meta-info {
@@ -63,6 +65,7 @@
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
+            font-weight: 400;
         }
     </style>
 </head>
