@@ -45,7 +45,7 @@ REPO_SSH_URL = "git@github.com:dmitray27/esp32-telegram.git"  # Замените
 
 @app.route('/')
 def index():
-    return '''
+    return
     <h1>Обновление файла на GitHub через SSH</h1>
     <form method="POST" action="/update">
         <textarea name="data" rows="10" cols="30"></textarea><br>
