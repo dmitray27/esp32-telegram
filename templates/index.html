@@ -15,16 +15,10 @@
             --font-primary: 'MedievalSharp', cursive;
         }
 
-        /* Шрифт для ВСЕХ элементов внутри контейнера */
+        /* Шрифт для всех элементов внутри контейнера */
         .container * {
             font-family: var(--font-primary) !important;
             letter-spacing: 0.5px;
-        }
-
-        /* Исключение для эмодзи */
-        .emoji {
-            font-family: "Segoe UI Emoji", "Apple Color Emoji", sans-serif !important;
-            font-size: 1.2em;
         }
 
         body {
@@ -49,10 +43,6 @@
         h1 {
             margin: 0 0 1.5rem;
             font-size: 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.75rem;
         }
 
         .temperature {
@@ -78,22 +68,12 @@
 </head>
 <body>
     <div class="container">
-        <h1>
-            <span class="emoji">🌑</span>
-            Температура
-        </h1>
-
+        <h1>Температура</h1>
         <div id="content">
             <div class="temperature">3,3,3°C</div>
             <div class="meta-info">
-                <div class="meta-item">
-                    <span class="emoji">📜</span>
-                    Дата: 2025-03-02
-                </div>
-                <div class="meta-item">
-                    <span class="emoji">⏳</span>
-                    Время: 15:49:43
-                </div>
+                <div class="meta-item">Дата: 2025-03-02</div>
+                <div class="meta-item">Время: 15:49:43</div>
             </div>
         </div>
     </div>
