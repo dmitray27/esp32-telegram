@@ -6,50 +6,54 @@
     <title>Монитор температуры</title>
     <style>
         :root {
-            --text-primary: #2d3748;
-            --text-secondary: #718096;
-            --bg-primary: #f7fafc;
-            --accent: #4299e1;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --bg-primary: #1a1a1a;
+            --accent: #8b0000;
+            --font-primary: 'MedievalSharp', cursive;
         }
 
         body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-family: var(--font-primary);
             background: var(--bg-primary);
             min-height: 100vh;
             margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
+            color: var(--text-primary);
             transition: background 0.3s ease;
         }
 
         .container {
-            background: white;
+            background: #2d2d2d;
             padding: 2rem;
-            border-radius: 1rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
             width: min(90%, 400px);
             text-align: center;
             transition: transform 0.2s ease;
+            border: 2px solid var(--accent);
         }
 
         h1 {
             color: var(--text-primary);
             margin: 0 0 1.5rem;
-            font-size: 1.75rem;
+            font-size: 2rem;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.75rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
         }
 
         .temperature {
-            font-size: 4.5rem;
-            font-weight: 300;
-            color: var(--text-primary);
+            font-size: 5rem;
+            font-weight: bold;
+            color: var(--accent);
             margin: 1rem 0;
             line-height: 1;
-            opacity: 0.9;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
         }
 
         .meta-info {
@@ -57,7 +61,7 @@
             gap: 1rem;
             margin-top: 2rem;
             color: var(--text-secondary);
-            font-size: 0.9rem;
+            font-size: 1rem;
         }
 
         .meta-item {
@@ -68,26 +72,21 @@
         }
 
         .error {
-            color: #e53e3e;
+            color: #ff4d4d;
             padding: 1rem;
-            background: #fff5f5;
+            background: #3a1a1a;
             border-radius: 0.5rem;
             margin: 1rem 0;
+            border: 1px solid #8b0000;
         }
 
-        .refresh-indicator {
-            height: 3px;
-            background: var(--accent);
-            width: 0%;
-            transition: width 5s linear;
-            margin-top: 1rem;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
     </style>
 </head>
 <body>
     <div class="container">
         <h1>
-            <span>🌡️</span>
+            <span>🌑</span>
             Температура
         </h1>
 
@@ -108,17 +107,12 @@
                 </div>
             {% endif %}
         </div>
-        <div class="refresh-indicator" id="refreshIndicator"></div>
     </div>
 
     <script>
         // Функция для плавного обновления данных
         async function refreshData() {
             try {
-                // Показываем индикатор обновления
-                const indicator = document.getElementById('refreshIndicator');
-                indicator.style.width = '100%';
-
                 const response = await fetch(window.location.href, {
                     headers: {
                         'Cache-Control': 'no-cache'
@@ -137,9 +131,6 @@
 
             } catch (error) {
                 console.error('Ошибка обновления:', error);
-            } finally {
-                // Сбрасываем индикатор
-                indicator.style.width = '0%';
             }
         }
 
