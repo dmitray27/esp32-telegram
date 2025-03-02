@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Монитор температуры</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
+
         :root {
             --text-primary: #e0e0e0;
             --text-secondary: #a0a0a0;
@@ -16,6 +18,11 @@
         * {
             font-family: var(--font-primary) !important;
             letter-spacing: 0.5px;
+        }
+
+        /* Исключения для эмодзи */
+        .meta-item span, h1 span {
+            font-family: "Segoe UI Emoji", "Apple Color Emoji", sans-serif !important;
         }
 
         body {
@@ -84,8 +91,6 @@
             border: 1px solid #8b0000;
             font-size: 0.9rem;
         }
-
-        @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
     </style>
 </head>
 <body>
