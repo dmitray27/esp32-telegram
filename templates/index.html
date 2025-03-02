@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Монитор температуры</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@900&display=swap');
 
         :root {
             --text-primary: #e0e0e0;
@@ -15,10 +15,10 @@
             --font-primary: 'Roboto', sans-serif;
         }
 
-        /* Наклонный шрифт для всех элементов */
+        /* Roboto Black (900) для всех элементов */
         body, .container * {
             font-family: var(--font-primary) !important;
-            font-style: italic; /* Добавлен курсив */
+            font-weight: 900; /* Черное начертание */
             letter-spacing: 0.5px;
         }
 
@@ -44,14 +44,12 @@
         h1 {
             margin: 0 0 1.5rem;
             font-size: 2rem;
-            font-weight: 700;
         }
 
         .temperature {
             font-size: 5rem;
             color: var(--accent);
             margin: 1rem 0;
-            font-weight: 400;
         }
 
         .meta-info {
@@ -66,7 +64,6 @@
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
-            font-weight: 400;
         }
     </style>
 </head>
