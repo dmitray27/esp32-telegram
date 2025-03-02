@@ -13,8 +13,12 @@
             --font-primary: 'MedievalSharp', cursive;
         }
 
+        * {
+            font-family: var(--font-primary) !important;
+            letter-spacing: 0.5px;
+        }
+
         body {
-            font-family: var(--font-primary);
             background: var(--bg-primary);
             min-height: 100vh;
             margin: 0;
@@ -78,6 +82,7 @@
             border-radius: 0.5rem;
             margin: 1rem 0;
             border: 1px solid #8b0000;
+            font-size: 0.9rem;
         }
 
         @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
@@ -110,34 +115,19 @@
     </div>
 
     <script>
-        // Функция для плавного обновления данных
         async function refreshData() {
             try {
                 const response = await fetch(window.location.href, {
-                    headers: {
-                        'Cache-Control': 'no-cache'
-                    }
+                    headers: { 'Cache-Control': 'no-cache' }
                 });
-
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
                 const html = await response.text();
-                const parser = new DOMParser();
-                const newDoc = parser.parseFromString(html, 'text/html');
-                const newContent = newDoc.getElementById('content').innerHTML;
-
-                // Плавное обновление контента
-                document.getElementById('content').innerHTML = newContent;
-
+                const newDoc = new DOMParser().parseFromString(html, 'text/html');
+                document.getElementById('content').innerHTML = newDoc.getElementById('content').innerHTML;
             } catch (error) {
                 console.error('Ошибка обновления:', error);
             }
         }
-
-        // Обновляем каждые 5 секунд
         setInterval(refreshData, 5000);
-
-        // Первое обновление через 100ms после загрузки
         setTimeout(refreshData, 100);
     </script>
 </body>
