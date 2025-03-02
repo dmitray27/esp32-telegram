@@ -15,14 +15,16 @@
             --font-primary: 'MedievalSharp', cursive;
         }
 
-        * {
+        /* Базовый шрифт для всех элементов */
+        body, h1, .temperature, .meta-item {
             font-family: var(--font-primary) !important;
             letter-spacing: 0.5px;
         }
 
-        /* Исключения для эмодзи */
-        .meta-item span, h1 span {
+        /* Специальные правила только для эмодзи */
+        .emoji {
             font-family: "Segoe UI Emoji", "Apple Color Emoji", sans-serif !important;
+            font-size: 1.2em;
         }
 
         body {
@@ -33,38 +35,30 @@
             justify-content: center;
             align-items: center;
             color: var(--text-primary);
-            transition: background 0.3s ease;
         }
 
         .container {
             background: #2d2d2d;
             padding: 2rem;
             border-radius: 0.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
             width: min(90%, 400px);
             text-align: center;
-            transition: transform 0.2s ease;
             border: 2px solid var(--accent);
         }
 
         h1 {
-            color: var(--text-primary);
             margin: 0 0 1.5rem;
             font-size: 2rem;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.75rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
         }
 
         .temperature {
             font-size: 5rem;
-            font-weight: bold;
             color: var(--accent);
             margin: 1rem 0;
-            line-height: 1;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
         }
 
         .meta-info {
@@ -72,7 +66,6 @@
             gap: 1rem;
             margin-top: 2rem;
             color: var(--text-secondary);
-            font-size: 1rem;
         }
 
         .meta-item {
@@ -81,59 +74,28 @@
             justify-content: center;
             gap: 0.5rem;
         }
-
-        .error {
-            color: #ff4d4d;
-            padding: 1rem;
-            background: #3a1a1a;
-            border-radius: 0.5rem;
-            margin: 1rem 0;
-            border: 1px solid #8b0000;
-            font-size: 0.9rem;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>
-            <span>🌑</span>
+            <span class="emoji">🌑</span>
             Температура
         </h1>
 
         <div id="content">
-            {% if data.error %}
-                <div class="error">{{ data.error }}</div>
-            {% else %}
-                <div class="temperature">{{ data.temperature }}°C</div>
-                <div class="meta-info">
-                    <div class="meta-item">
-                        <span>📜</span>
-                        Дата: {{ data.date }}
-                    </div>
-                    <div class="meta-item">
-                        <span>⏳</span>
-                        Время: {{ data.time }}
-                    </div>
+            <div class="temperature">33,3°C</div>
+            <div class="meta-info">
+                <div class="meta-item">
+                    <span class="emoji">📜</span>
+                    Дата: 2025-03-02
                 </div>
-            {% endif %}
+                <div class="meta-item">
+                    <span class="emoji">⏳</span>
+                    Время: 15:49:43
+                </div>
+            </div>
         </div>
     </div>
-
-    <script>
-        async function refreshData() {
-            try {
-                const response = await fetch(window.location.href, {
-                    headers: { 'Cache-Control': 'no-cache' }
-                });
-                const html = await response.text();
-                const newDoc = new DOMParser().parseFromString(html, 'text/html');
-                document.getElementById('content').innerHTML = newDoc.getElementById('content').innerHTML;
-            } catch (error) {
-                console.error('Ошибка обновления:', error);
-            }
-        }
-        setInterval(refreshData, 5000);
-        setTimeout(refreshData, 100);
-    </script>
 </body>
 </html>
