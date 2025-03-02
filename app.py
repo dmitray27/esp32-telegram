@@ -1,16 +1,3 @@
-<<<<<<< HEAD
-from flask import Flask, request
-import git
-import os
-=======
-from flask import Flask, render_template
-from datetime import datetime
-import requests
-import json
-from collections import deque
-import time
->>>>>>> 2a807a2c39006631aca0319fe83058b4fb7a3a8a
-
 app = Flask(__name__)
 GITHUB_URL = "https://raw.githubusercontent.com/dmitray27/esp32/main/tem.txt"
 
@@ -52,7 +39,6 @@ def disable_caching(response):
     response.headers["Cache-Control"] = "no-store, max-age=0"
     return response
 
-<<<<<<< HEAD
 # Путь к локальной копии репозитория
 REPO_PATH = "."  # Замените на реальный путь
 REPO_SSH_URL = "git@github.com:dmitray27/esp32-telegram.git"  # Замените на ваш SSH-URL
@@ -65,7 +51,6 @@ def index():
         <textarea name="data" rows="10" cols="30"></textarea><br>
         <input type="submit" value="Отправить">
     </form>
-    '''
 
 
 @app.route('/update', methods=['POST'])
@@ -93,7 +78,7 @@ def update_file():
 
     return "Файл успешно обновлен и отправлен на GitHub!"
 
-=======
+
 @app.route('/')
 def index():
     try:
@@ -105,7 +90,7 @@ def index():
         load_time = 0  # В случае ошибки время загрузки = 0
 
     return render_template('index.html', data=sensor_data, history=list(data_history), load_time=load_time)
->>>>>>> 2a807a2c39006631aca0319fe83058b4fb7a3a8a
+
 
 if __name__ == '__main__':
     app.run(debug=False)
