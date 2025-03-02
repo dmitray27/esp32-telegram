@@ -5,25 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Монитор температуры</title>
     <style>
-        /* Стимпанк стили */
         :root {
-            --text-primary: #d4af37; /* Золотой */
-            --text-secondary: #8b8000; /* Темно-желтый */
-            --bg-primary: #2c2c2c; /* Темный фон */
-            --accent: #c0a050; /* Бронзовый */
-            --error: #b22222; /* Огненно-красный */
-            --metal: #808080; /* Металлический серый */
+            --text-primary: #d4af37;
+            --text-secondary: #8b8000;
+            --bg-primary: #2c2c2c;
+            --accent: #c0a050;
+            --error: #b22222;
         }
 
         body {
-            font-family: 'Cinzel', serif; /* Шрифт в стиле стимпанк */
+            font-family: 'Cinzel', serif;
             background: var(--bg-primary);
             min-height: 100vh;
             margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: background 0.3s ease;
         }
 
         .container {
@@ -33,7 +30,6 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
             width: min(90%, 400px);
             text-align: center;
-            transition: transform 0.2s ease;
             border: 2px solid var(--accent);
         }
 
@@ -53,7 +49,6 @@
             color: var(--text-primary);
             margin: 1.5rem 0;
             line-height: 1;
-            opacity: 0.9;
             text-shadow: 0 0 5px var(--accent);
         }
 
@@ -81,44 +76,6 @@
             font-size: 0.9rem;
             border: 1px solid var(--error);
         }
-
-        .refresh-indicator {
-            height: 4px;
-            background: var(--accent);
-            width: 0%;
-            transition: width 10s linear;
-            margin-top: 1.5rem;
-            border-radius: 2px;
-        }
-
-        .history {
-            margin-top: 2rem;
-            text-align: left;
-        }
-
-        .history h2 {
-            font-size: 1.25rem;
-            color: var(--text-primary);
-            margin-bottom: 1rem;
-        }
-
-        .history-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid var(--metal);
-            color: var(--text-secondary);
-        }
-
-        .history-item:last-child {
-            border-bottom: none;
-        }
-
-        .load-time {
-            margin-top: 1rem;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
@@ -144,36 +101,15 @@
                         {{ data.time }}
                     </div>
                 </div>
-                <div class="load-time">
-                    Время загрузки: {{ "%.2f"|format(load_time) }} сек
-                </div>
             {% endif %}
         </div>
-
-        <!-- Блок истории данных -->
-        <div class="history">
-            <h2>История измерений</h2>
-            {% for entry in history %}
-                <div class="history-item">
-                    <span>{{ entry.temperature }}°C</span>
-                    <span>{{ entry.date }} {{ entry.time }}</span>
-                </div>
-            {% endfor %}
-        </div>
-
-        <div class="refresh-indicator" id="refreshIndicator"></div>
     </div>
 
     <script>
         async function refreshData() {
-            const indicator = document.getElementById('refreshIndicator');
-            indicator.style.width = '100%';
-
             try {
                 const response = await fetch(window.location.href, {
-                    headers: {
-                        'Cache-Control': 'no-cache'
-                    }
+                    headers: {'Cache-Control': 'no-cache'}
                 });
 
                 if (!response.ok) throw new Error(`Ошибка HTTP: ${response.status}`);
@@ -181,22 +117,13 @@
                 const html = await response.text();
                 const parser = new DOMParser();
                 const newDoc = parser.parseFromString(html, 'text/html');
-                const newContent = newDoc.getElementById('content').innerHTML;
-                const newHistory = newDoc.querySelector('.history').innerHTML;
-
-                document.getElementById('content').innerHTML = newContent;
-                document.querySelector('.history').innerHTML = newHistory;
-                console.log("Данные успешно обновлены");
-
+                document.getElementById('content').innerHTML = newDoc.getElementById('content').innerHTML;
+                
             } catch (error) {
                 console.error('Ошибка обновления:', error);
                 document.getElementById('content').innerHTML = `
                     <div class="error">Ошибка загрузки данных: ${error.message}</div>
                 `;
-            } finally {
-                setTimeout(() => {
-                    indicator.style.width = '0%';
-                }, 10000); // Синхронизировано с интервалом
             }
         }
 
