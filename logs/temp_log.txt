@@ -1,1 +1,1 @@
-{"temperature":42.8,"voltage":3.30,"free_heap":189312,"cpu_freq":240,"wifi_rssi":-46,"uptime":"2h 59m","timestamp":"2025-03-11T20:57:31+0300"}
+{"temperature":41.7,"voltage":3.30,"free_heap":189320,"cpu_freq":240,"wifi_rssi":-51,"uptime":"3h 3m","timestamp":"2025-03-11T21:01:36+0300"}
