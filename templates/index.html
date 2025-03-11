@@ -28,7 +28,7 @@
             border-radius: 1rem;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             width: min(90%, 400px);
-        } /* Убрано text-align: center */
+        }
 
         h1 {
             color: var(--text-primary);
@@ -36,7 +36,7 @@
             font-weight: 300;
             margin: 0 0 1.5rem;
             line-height: 1.5;
-            text-align: left; /* Добавлено выравнивание по левому краю */
+            text-align: left;
         }
 
         .parameters-title {
@@ -44,17 +44,17 @@
             color: var(--text-primary);
             margin-bottom: 1rem;
             font-weight: 500;
-            text-align: left; /* Выравнивание по левому краю */
+            text-align: left;
         }
 
         .parameters-block {
             margin: 1rem 0;
-            text-align: left; /* Выравнивание по левому краю */
+            text-align: left;
         }
 
         .param {
-            font-size: 0.9rem; /* Совпадает с размером meta-info */
-            color: var(--text-secondary); /* Цвет как у даты/времени */
+            font-size: 0.9rem;
+            color: var(--text-secondary);
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -66,7 +66,7 @@
             margin-top: 1.5rem;
             color: var(--text-secondary);
             font-size: 0.9rem;
-            text-align: left; /* Выравнивание по левому краю */
+            text-align: left;
         }
 
         .meta-item {
@@ -74,6 +74,12 @@
             align-items: center;
             gap: 0.5rem;
             margin: 0.3rem 0;
+        }
+
+        /* Добавлено жирное начертание для заголовка */
+        .meta-info .meta-item:first-child {
+            font-weight: 700;
+            color: var(--text-primary);
         }
 
         .error {
