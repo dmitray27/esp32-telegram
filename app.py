@@ -41,7 +41,7 @@ def fetch_github_data():
         ]
         
         if not valid_lines:
-            raise ValueError("Файл пуст или все строки закомментированы")
+            raise ValueError("Микроконтроллер ESP32 выключен.")
             
         # Берем последнюю актуальную запись
         return valid_lines[-1]
