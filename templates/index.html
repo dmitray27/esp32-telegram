@@ -20,7 +20,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: background 0.3s ease;
         }
 
         .container {
@@ -29,56 +28,40 @@
             border-radius: 1rem;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             width: min(90%, 400px);
-            text-align: center;
-            transition: transform 0.2s ease;
+            text-align: left;
         }
 
         h1 {
             color: var(--text-primary);
-            margin: 0 0 1.5rem;
             font-size: 1rem;
             font-weight: 300;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.75rem;
-            line-height: 1.5;
             text-align: center;
+            margin: 0 0 1.5rem;
+            line-height: 1.5;
         }
 
-        .main-data {
-            margin-bottom: 1.5rem;
-            text-align: left;
-        }
-
-        .temperature {
+        .parameters-title {
             font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin: 1rem 0;
             color: var(--text-primary);
+            margin-bottom: 1rem;
+            font-weight: 500;
         }
 
-        .additional-info {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            margin-top: 1.5rem;
+        .parameters-block {
+            margin: 1rem 0;
         }
 
         .param {
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: var(--text-primary);
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            margin: 0.5rem 0;
         }
 
         .meta-info {
-            display: grid;
-            gap: 0.5rem;
-            margin-top: 2rem;
+            margin-top: 1.5rem;
             color: var(--text-secondary);
             font-size: 0.9rem;
             text-align: center;
@@ -89,6 +72,7 @@
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
+            margin: 0.3rem 0;
         }
 
         .error {
@@ -118,18 +102,29 @@
             {% if data.error %}
                 <div class="error">{{ data.error }}</div>
             {% else %}
-                <div class="main-data">
-                    <div class="temperature">
+                <div class="parameters-block">
+                    <div class="parameters-title">Параметры микроконтроллера ESP32:</div>
+                    
+                    <div class="param">
                         🌡️ Температура: {{ data.temperature }}°С
                     </div>
-                    <div class="additional-info">
-                        <div class="param">🔋 Напряжение питания: {{ data.voltage }} В</div>
-                        <div class="param">💾 Свободная память: {{ data.free_heap }} байт</div>
-                        <div class="param">〰️ Частота процессора: {{ data.cpu_freq }} МГц</div>
-                        <div class="param">📶 Уровень Wi-Fi: {{ data.wifi_rssi }} dBm</div>
-                        <div class="param">⏳ Время работы: {{ data.uptime }}</div>
+                    <div class="param">
+                        🔋 Напряжение питания: {{ data.voltage }} В
+                    </div>
+                    <div class="param">
+                        💾 Свободная память: {{ data.free_heap }} байт
+                    </div>
+                    <div class="param">
+                        〰️ Частота процессора: {{ data.cpu_freq }} МГц
+                    </div>
+                    <div class="param">
+                        📶 Уровень Wi-Fi: {{ data.wifi_rssi }} dBm
+                    </div>
+                    <div class="param">
+                        ⏳ Время работы: {{ data.uptime }}
                     </div>
                 </div>
+
                 <div class="meta-info">
                     <div class="meta-item">Последнее обновление:</div>
                     <div class="meta-item">
