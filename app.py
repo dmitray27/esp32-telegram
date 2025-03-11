@@ -3,7 +3,7 @@ import requests
 import json
 from datetime import datetime
 from collections import deque
-import git
+#import git
 import os
 import time
 
