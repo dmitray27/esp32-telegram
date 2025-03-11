@@ -1,103 +1,82 @@
-from flask import Flask, request, render_template
+# Патчинг gevent должен быть выполнен ПЕРВЫМ
+from gevent import monkey
+monkey.patch_all()
+
+from flask import Flask, render_template
+from datetime import datetime
 import requests
 import json
-from datetime import datetime
-from collections import deque
-#import git
 import os
-import time
+import logging
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-key')
+GITHUB_URL = "https://raw.githubusercontent.com/dmitray27/esp32-telegram/main/tem.txt"
 
-# Конфигурация GitHub
-GITHUB_RAW_URL = "https://raw.githubusercontent.com/dmitray27/esp32/main/tem.txt"
-REPO_PATH = "/full/path/to/your/local/repo"  # Абсолютный путь к локальной копии репозитория
-REPO_SSH_URL = "git@github.com:dmitray27/esp32-telegram.git"
+# Настройка логирования
+logging.basicConfig(level=logging.INFO)
 
-# Ограничим историю последними 10 записями
-data_history = deque(maxlen=10)
+@app.route('/health')
+def health_check():
+    return 'OK', 200
 
 def fetch_github_data():
     try:
-        start_time = time.time()
+        # Добавляем уникальный параметр для обхода кэша
+        timestamp = int(datetime.now().timestamp())
+        url = f"{GITHUB_URL}?nocache={timestamp}"
+
         response = requests.get(
-            f"{GITHUB_RAW_URL}?t={int(time.time())}",  # Добавляем временную метку против кэширования
-            timeout=3,
+            url,
+            timeout=5,
             headers={'Cache-Control': 'no-cache'}
         )
         response.raise_for_status()
-        return response.text.strip(), time.time() - start_time
+        return response.text.strip()
     except requests.RequestException as e:
-        raise Exception(f"Ошибка получения данных: {str(e)}")
+        logging.error(f"Ошибка запроса: {str(e)}")
+        raise Exception("Не удалось получить данные")
 
 def parse_sensor_data(raw_data):
     try:
         data = json.loads(raw_data)
-        # Исправляем формат временной зоны
-        timestamp = data['timestamp'].replace("+0300", "+03:00")
-        dt = datetime.fromisoformat(timestamp)
-        
+        # Исправление формата времени (удаление смещения +0300)
+        dt_str = data['timestamp'].replace('+0300', '')
+        dt = datetime.fromisoformat(dt_str)
+
+        # Преобразование uptime в "ч. м."
+        uptime = data['uptime'].replace("h", "ч.").replace("m", "м.")
+
         return {
             'temperature': data['temperature'],
-            'date': dt.strftime("%Y-%m-%d"),
+            'voltage': data['voltage'],
+            'free_heap': data['free_heap'],
+            'cpu_freq': data['cpu_freq'],
+            'wifi_rssi': data['wifi_rssi'],
+            'uptime': uptime,
+            'date': dt.strftime("%d.%m.%Y"),  # Измененный формат
             'time': dt.strftime("%H:%M:%S"),
             'error': None
         }
     except (KeyError, json.JSONDecodeError, ValueError) as e:
-        raise ValueError(f"Ошибка формата данных: {str(e)}")
+        logging.error(f"Ошибка парсинга: {str(e)}")
+        raise ValueError("Некорректные данные")
 
 @app.after_request
 def disable_caching(response):
     response.headers["Cache-Control"] = "no-store, max-age=0"
     return response
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
 def index():
-    sensor_data = {}
-    load_time = 0
-    
+    sensor_data = {'error': None}
     try:
-        # Для GET-запросов получаем данные
-        if request.method == 'GET':
-            raw_data, load_time = fetch_github_data()
-            sensor_data = parse_sensor_data(raw_data)
-            data_history.append(sensor_data)
-            
+        raw_data = fetch_github_data()
+        sensor_data = parse_sensor_data(raw_data)
     except Exception as e:
-        sensor_data = {'error': str(e)}
-    
-    return render_template('index.html', 
-                         data=sensor_data,
-                         history=list(data_history),
-                         load_time=load_time)
+        sensor_data['error'] = str(e)
 
-@app.route('/update', methods=['POST'])
-def update_file():
-    try:
-        new_data = request.form['data']
-        
-        # Проверяем существование локального репозитория
-        if not os.path.exists(REPO_PATH):
-            raise Exception("Локальный репозиторий не найден")
-            
-        repo = git.Repo(REPO_PATH)
-        
-        # Обновляем файл
-        file_path = os.path.join(REPO_PATH, "data.txt")
-        with open(file_path, "w") as f:
-            f.write(new_data)
-            
-        # Git операции
-        repo.git.add("--all")
-        repo.git.commit("-m", "Обновление через Flask-приложение")
-        origin = repo.remote(name="origin")
-        origin.push()
-        
-        return "Файл успешно обновлен и отправлен на GitHub!"
-        
-    except Exception as e:
-        return f"Ошибка: {str(e)}", 500
+    return render_template('index.html', data=sensor_data)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=10000, debug=False)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host='0.0.0.0', port=port, debug=True)
